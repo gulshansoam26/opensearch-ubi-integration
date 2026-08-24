@@ -10,10 +10,11 @@ import type { Product } from "../types/Product";
 
 interface ProductCardProps {
   product: Product;
-  onViewDetails: (product: Product) => void;
+   position: number;
+  onViewDetails: (product: Product,position: number) => void;
 }
 
-const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
+const ProductCard = ({ product, onViewDetails ,position}: ProductCardProps) => {
   return (
     <Card
       sx={{
@@ -75,7 +76,7 @@ const ProductCard = ({ product, onViewDetails }: ProductCardProps) => {
         <Button
           fullWidth
           variant="outlined"
-          onClick={() => onViewDetails(product)}
+          onClick={() => onViewDetails(product,position)}
           sx={{
             textTransform: "none",
             fontWeight: 600,

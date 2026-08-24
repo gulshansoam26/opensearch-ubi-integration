@@ -9,12 +9,15 @@ interface ProductListProps {
 
 const ProductList = ({ products }: ProductListProps) => {
 
-  const handleViewDetails = (product: Product) => {
+  const handleViewDetails = (product: Product,position: number) => {
     captureEvent("click", {
      attributes: {
       object: {
         object_id: product.id,
         object_id_type: "product",
+      },
+      position: {
+        ordinal: position,
       },
       product_name: product.name,
       category: product.category,
@@ -36,13 +39,14 @@ const ProductList = ({ products }: ProductListProps) => {
       </Typography>
 
       <Grid container spacing={3}>
-        {products.map((product) => (
+        {products.map((product,index) => (
           <Grid
             size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
             key={product.id}
           >
             <ProductCard
               product={product}
+              position={index + 1}
               onViewDetails={handleViewDetails}
             />
           </Grid>

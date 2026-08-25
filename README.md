@@ -62,6 +62,10 @@ Open the website and perform searches, views, and product clicks.
 
 Analytics dashboard: `http://localhost:5173/insights`
 
+## Demo:
+https://github.com/user-attachments/assets/fd106c7e-2c06-4cba-bcf0-e76d573d8b62
+
+
 ## Assumptions
 
 - OpenSearch 3.0.0 and the UBI plugin are installed locally.

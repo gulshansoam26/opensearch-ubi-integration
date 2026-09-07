@@ -66,7 +66,7 @@ const SearchBar = ({
           fullWidth
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search for products, books..."
+          placeholder="Search by product name or category"
           variant="outlined"
           size="medium"
           sx={{
@@ -81,6 +81,7 @@ const SearchBar = ({
         <Button
           type="submit"
           variant="contained"
+          disabled={!search.trim()}
           sx={{
             minWidth: 110,
             borderRadius: "0 8px 8px 0",

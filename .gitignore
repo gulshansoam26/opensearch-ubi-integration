@@ -1,9 +1,9 @@
 # Frontend
-frontend/node_modules/
-frontend/dist/
+shopease/node_modules/
+shopease/dist/
 
 # Backend
-backend/target/
+ubi-backend/target/
 
 # IDE
 .idea/
@@ -19,3 +19,7 @@ backend/target/
 
 # Logs
 *.log
+
+# OS
+.DS_Store
+Thumbs.db

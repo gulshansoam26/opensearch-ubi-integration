@@ -1,9 +1,8 @@
 package com.example.ubi_backend.controller;
 
-import com.example.ubi_backend.dto.UBIEvent;
+import com.example.ubi_backend.service.KafkaProducerService;
 import com.example.ubi_backend.service.OpenSearchService;
 import com.example.ubi_backend.validation.UBISchemaValidator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.ValidationMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +14,19 @@ import java.util.Set;
 @CrossOrigin(origins = "http://localhost:5173")
 public class EventController {
 
-    private final OpenSearchService openSearchService;
+    private final KafkaProducerService kafkaProducerService;
     private final UBISchemaValidator ubiSchemaValidator;
+    private final OpenSearchService openSearchService;
 
 
     public EventController(
-            OpenSearchService openSearchService,
-            UBISchemaValidator ubiSchemaValidator) {
+            KafkaProducerService kafkaProducerService,
+            UBISchemaValidator ubiSchemaValidator,
+            OpenSearchService openSearchService) {
 
-        this.openSearchService = openSearchService;
+        this.kafkaProducerService = kafkaProducerService;
         this.ubiSchemaValidator = ubiSchemaValidator;
+        this.openSearchService= openSearchService;
     }
 
     @PostMapping
@@ -46,12 +48,7 @@ public class EventController {
                         .body(errors);
             }
 
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            UBIEvent ubiEvent =
-                    objectMapper.readValue(eventJson, UBIEvent.class);
-
-            openSearchService.saveEvent(ubiEvent);
+            kafkaProducerService.sendEvent(eventJson);
 
             return ResponseEntity.ok(
                     "Event received and stored"

@@ -7,23 +7,44 @@ import ProductList from "./components/ProductList";
 import SearchBar from "./components/SearchBar";
 import AnalyticsDashboard from "./components/AnalyticsData";
 
-import { products } from "./data/products";
+import type { Product } from "./types/Product";
 import { captureEvent } from "./services/eventTracker";
+import axios from "axios";
+import { Box } from "@mui/material";
 
 function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
+   const fetchProducts = async (search = "") => {
+    try {
+      const response = await axios.get<Product[]>(
+        "http://localhost:8080/api/products",
+        {
+          params: {
+            search: search || undefined,
+          },
+        }
+      );
 
-    captureEvent("search", {
-      query: query,
-    });
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    fetchProducts();
+  }, []); 
+
+  const handleSearch = (query: string) => {
+    fetchProducts(query);
+    if (query.trim()) {
+    captureEvent("search", {
+      query: query.trim(),
+    });
+  }
+  };
+
 
  const viewTracked = useRef(false);
 
@@ -35,15 +56,29 @@ useEffect(() => {
 }, []);
 
   return (
-    <>
-      <Navbar />
+    <Box
+  sx={{
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+  }}
+>
+  <Navbar />
 
-      <SearchBar onSearch={handleSearch} />
+  <SearchBar onSearch={handleSearch} />
 
-      <ProductList products={filteredProducts} />
+  <Box sx={{ flex: 1 }}>
+    {products.length > 0 ? (
+      <ProductList products={products} />
+    ) : (
+      <Box sx={{ textAlign: "center", py: 8 }}>
+        No products found.
+      </Box>
+    )}
+  </Box>
 
-      <Footer />
-    </>
+  <Footer />
+</Box>
   );
 }
 

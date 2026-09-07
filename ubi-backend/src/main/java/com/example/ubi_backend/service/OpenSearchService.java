@@ -27,8 +27,6 @@ public class OpenSearchService {
     }
 
     public void saveEvent(UBIEvent event) {
-
-        try {
             restClient.post()
                     .uri("/ubi_events/_doc")
                     .body(event)
@@ -36,11 +34,6 @@ public class OpenSearchService {
                     .toBodilessEntity();
 
             System.out.println("Event saved to OpenSearch");
-
-        } catch (Exception e) {
-            System.out.println("Failed to save event to OpenSearch: "
-                    + e.getMessage());
-        }
     }
 
     public String getSummary() {

@@ -8,14 +8,14 @@ The application follows this flow:
 
 React Frontend → Spring Boot Backend → UBI Validation → Kafka → Kafka Consumer → OpenSearch UBI
 
-React captures view, search, and click events.
-Events are sent to the Spring Boot backend using Axios.
-Spring Boot validates events against the UBI event schema.
-Valid events are published to the Kafka ubi-events topic.
-Kafka Consumer reads events from the topic and sends them to OpenSearch.
-If OpenSearch is unavailable, the consumer retries the event every 5 seconds.
-Product data is stored in MongoDB and accessed through the Spring Boot Product API.
-The /insights page displays aggregated view, search, and click counts from OpenSearch.
+- React captures view, search, and click events.
+- Events are sent to the Spring Boot backend using Axios.
+- Spring Boot validates events against the UBI event schema.
+- Valid events are published to the Kafka ubi-events topic.
+- Kafka Consumer reads events from the topic and sends them to OpenSearch.
+- If OpenSearch is unavailable, the consumer retries the event every 5 seconds.
+- Product data is stored in MongoDB and accessed through the Spring Boot Product API.
+- The /insights page displays aggregated view, search, and click counts from OpenSearch.
 
 ![Architecture Diagram](architecture.png)
 
@@ -147,13 +147,13 @@ https://github.com/user-attachments/assets/fd106c7e-2c06-4cba-bcf0-e76d573d8b62
 
 
 ## Assumptions
--OpenSearch 3.0.0 and the UBI plugin are installed locally.
--OpenSearch runs on https://localhost:9200.
--A PKCS12 truststore containing the OpenSearch CA certificate is configured for the backend.
--MongoDB runs locally on localhost:27017.
--Kafka runs through Docker on localhost:9092.
--The ubi-events Kafka topic is configured with one partition and one replica for the local setup.
--OpenSearch credentials and truststore credentials are configured locally and should not be  committed to GitHub.
+- OpenSearch 3.0.0 and the UBI plugin are installed locally.
+- OpenSearch runs on https://localhost:9200.
+- A PKCS12 truststore containing the OpenSearch CA certificate is configured for the backend.
+- MongoDB runs locally on localhost:27017.
+- Kafka runs through Docker on localhost:9092.
+- The ubi-events Kafka topic is configured with one partition and one replica for the local setup.
+- OpenSearch credentials and truststore credentials are configured locally and should not be committed to GitHub.
 
 
 ## References

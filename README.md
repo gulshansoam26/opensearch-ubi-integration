@@ -148,7 +148,7 @@ Ask AI Assistant
 - OpenSearch credentials and truststore credentials are configured locally and should not be committed to GitHub.
 
 ## References
-- https://github.com/opensearch-project/user-behavior-insights
-- https://github.com/o19s/ubi
-- https://o19s.github.io/ubi/schema/latest/event.schema.json
-- https://modelcontextprotocol.io/
+- OpenSearch User Behavior Insights-"https://github.com/opensearch-project/user-behavior-insights"
+- UBI Project-"https://github.com/o19s/ubi"
+- UBI Event Schema-"https://o19s.github.io/ubi/schema/latest/event.schema.json"
+- Model Context Protocol (MCP)-"https://modelcontextprotocol.io/"

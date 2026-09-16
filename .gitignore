@@ -5,6 +5,10 @@ shopease/dist/
 # Backend
 ubi-backend/target/
 
+# MCP Server
+ubi-mcp-server/node_modules/
+ubi-mcp-server/dist/
+
 # IDE
 .idea/
 *.iml

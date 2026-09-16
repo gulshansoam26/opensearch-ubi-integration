@@ -14,14 +14,18 @@ import { Box } from "@mui/material";
 
 function Home() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-   const fetchProducts = async (search = "") => {
+   const fetchProducts = async (search = "", category = "") => {
     try {
       const response = await axios.get<Product[]>(
         "http://localhost:8080/api/products",
         {
           params: {
             search: search || undefined,
+            category: category || undefined,
           },
         }
       );
@@ -32,18 +36,50 @@ function Home() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get<string[]>(
+        "http://localhost:8080/api/products/categories"
+      );
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []); 
 
   const handleSearch = (query: string) => {
-    fetchProducts(query);
-    if (query.trim()) {
+  setSearchQuery(query);
+  fetchProducts(query, selectedCategory);
+
+  if (query.trim()) {
     captureEvent("search", {
       query: query.trim(),
     });
   }
-  };
+};
+
+const handleCategoryChange = (category: string) => {
+  setSelectedCategory(category);
+  fetchProducts(searchQuery, category);
+
+  if (category) {
+  const position = categories.indexOf(category) + 1;
+
+    captureEvent("filter", {
+      attributes: {
+        category: category,
+        position: {
+          ordinal: position,
+        },
+      },
+    });
+  }
+};
 
 
  const viewTracked = useRef(false);
@@ -65,7 +101,12 @@ useEffect(() => {
 >
   <Navbar />
 
-  <SearchBar onSearch={handleSearch} />
+  <SearchBar 
+    onSearch={handleSearch}
+    categories={categories}
+    selectedCategory={selectedCategory}
+    onCategoryChange={handleCategoryChange}
+    />
 
   <Box sx={{ flex: 1 }}>
     {products.length > 0 ? (

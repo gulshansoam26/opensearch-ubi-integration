@@ -1,13 +1,14 @@
 package com.example.ubi_backend.controller;
 
 import com.example.ubi_backend.service.KafkaProducerService;
-import com.example.ubi_backend.service.OpenSearchService;
 import com.example.ubi_backend.validation.UBISchemaValidator;
-import com.networknt.schema.ValidationMessage;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.networknt.schema.Error;
 
-import java.util.Set;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/events")
@@ -16,17 +17,14 @@ public class EventController {
 
     private final KafkaProducerService kafkaProducerService;
     private final UBISchemaValidator ubiSchemaValidator;
-    private final OpenSearchService openSearchService;
 
 
     public EventController(
             KafkaProducerService kafkaProducerService,
-            UBISchemaValidator ubiSchemaValidator,
-            OpenSearchService openSearchService) {
+            UBISchemaValidator ubiSchemaValidator) {
 
         this.kafkaProducerService = kafkaProducerService;
         this.ubiSchemaValidator = ubiSchemaValidator;
-        this.openSearchService= openSearchService;
     }
 
     @PostMapping
@@ -38,8 +36,7 @@ public class EventController {
 
         try {
 
-            Set<ValidationMessage> errors =
-                    ubiSchemaValidator.validate(eventJson);
+            List<Error> errors = ubiSchemaValidator.validate(eventJson);
 
             System.out.println("Validation errors: " + errors);
 
@@ -61,11 +58,4 @@ public class EventController {
         }
     }
 
-    @GetMapping("/analytics/summary")
-    public ResponseEntity<String> getSummary() {
-
-        return ResponseEntity.ok(
-                openSearchService.getSummary()
-        );
-    }
 }

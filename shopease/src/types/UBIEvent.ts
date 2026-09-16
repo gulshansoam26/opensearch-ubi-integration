@@ -1,4 +1,4 @@
-export type UBIAction = "view" | "search" | "click";
+export type UBIAction = "view" | "search" | "click" | "filter";
 
 export interface UBIEvent {
   action_name: UBIAction;

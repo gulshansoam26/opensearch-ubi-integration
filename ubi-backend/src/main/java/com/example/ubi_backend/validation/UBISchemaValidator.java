@@ -1,21 +1,22 @@
 package com.example.ubi_backend.validation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchema;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import com.networknt.schema.dialect.Dialects;
+import com.networknt.schema.Error;
+import com.networknt.schema.Schema;
+import com.networknt.schema.SchemaRegistry;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Component
 public class UBISchemaValidator {
 
-    private final JsonSchema schema;
+    private final Schema schema;
     private final ObjectMapper objectMapper;
 
     public UBISchemaValidator() throws IOException {
@@ -23,19 +24,20 @@ public class UBISchemaValidator {
         ClassPathResource resource =
                 new ClassPathResource("ubi/event.schema.json");
 
-        JsonSchemaFactory factory =
-                JsonSchemaFactory.getInstance(
-                        SpecVersion.VersionFlag.V202012
-                );
+        SchemaRegistry schemaRegistry =
+                SchemaRegistry.withDialect(Dialects.getDraft202012());
 
-        this.schema = factory.getSchema(
-                resource.getInputStream()
+        String schemaData = new String(
+                resource.getInputStream().readAllBytes(),
+                StandardCharsets.UTF_8
         );
+
+        this.schema = schemaRegistry.getSchema(schemaData);
 
         this.objectMapper = new ObjectMapper();
     }
 
-    public Set<ValidationMessage> validate(String json)
+    public List<Error> validate(String json)
             throws IOException {
 
         JsonNode jsonNode =

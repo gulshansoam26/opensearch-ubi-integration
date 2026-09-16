@@ -9,7 +9,10 @@ import java.util.Optional;
 public interface ProductRepository
         extends MongoRepository<Product, Integer> {
 
-    Optional<Product> findByNameIgnoreCase(String name);
+    List<Product> findByNameContainingIgnoreCase(String name);
 
     List<Product> findByCategoryIgnoreCase(String category);
+
+    List<Product> findByNameContainingIgnoreCaseAndCategoryIgnoreCase(
+            String name, String category);
 }

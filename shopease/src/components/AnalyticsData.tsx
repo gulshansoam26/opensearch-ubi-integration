@@ -8,16 +8,41 @@ import {
   Container,
   Grid,
   Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import MouseIcon from "@mui/icons-material/Mouse";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import AskAI from "./AskAI";
 
 interface AnalyticsData {
   search: number;
   view: number;
   click: number;
+  filter: number;
+}
+
+interface KeywordCount {
+  keyword: string;
+  count: number;
+}
+
+interface ProductClickCount {
+  productName: string;
+  count: number;
+}
+
+interface CategoryFilterCount {
+  category: string;
+  count: number;
 }
 
 const AnalyticsDashboard = () => {
@@ -25,46 +50,73 @@ const AnalyticsDashboard = () => {
     search: 0,
     view: 0,
     click: 0,
+    filter: 0,
   });
+
+  const [topQueries, setTopQueries] = useState<KeywordCount[]>([]);
+
+  const [topProducts, setTopProducts] = useState<ProductClickCount[]>([]);
+
+  const [topCategories, setTopCategories] = useState<CategoryFilterCount[]>([]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8080/api/events/analytics/summary"
+        const response = await axios.get<Record<string, number>>(
+          "http://localhost:8080/api/analytics/summary"
         );
 
-        const buckets = response.data.aggregations.actions.buckets;
-
-        const analytics: AnalyticsData = {
-          search: 0,
-          view: 0,
-          click: 0,
-        };
-
-        buckets.forEach(
-          (bucket: { key: string; doc_count: number }) => {
-            if (bucket.key === "search") {
-              analytics.search = bucket.doc_count;
-            }
-
-            if (bucket.key === "view") {
-              analytics.view = bucket.doc_count;
-            }
-
-            if (bucket.key === "click") {
-              analytics.click = bucket.doc_count;
-            }
-          }
-        );
-
-        setData(analytics);
+        setData({
+      search: response.data.search ?? 0,
+      view: response.data.view ?? 0,
+      click: response.data.click ?? 0,
+      filter: response.data.filter ?? 0,
+    });
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
       }
     };
 
+    const fetchTopQueries = async () => {
+    try {
+      const response = await axios.get<KeywordCount[]>(
+        "http://localhost:8080/api/analytics/top-queries",
+  { params: { size: 5 } }
+      );
+      setTopQueries(response.data);
+    } catch (error) {
+      console.error("Failed to fetch top queries:", error);
+    }
+  };
+
+  const fetchTopProducts = async () => {
+  try {
+    const response = await axios.get<ProductClickCount[]>(
+      "http://localhost:8080/api/analytics/top-clicked-products",
+      { params: { size: 5 } }
+    );
+    setTopProducts(response.data);
+  } catch (error) {
+    console.error("Failed to fetch top products:", error);
+  }
+};
+
+const fetchTopCategories = async () => {
+  try {
+    const response = await axios.get<CategoryFilterCount[]>(
+      "http://localhost:8080/api/analytics/top-filtered-categories",
+      { params: { size: 5 } }
+    );
+    setTopCategories(response.data);
+  } catch (error) {
+    console.error("Failed to fetch top categories:", error);
+  }
+};
+
     fetchAnalytics();
+    fetchTopQueries();
+    fetchTopProducts();
+    fetchTopCategories();
   }, []);
 
   const cards = [
@@ -85,6 +137,12 @@ const AnalyticsDashboard = () => {
       value: data.click,
       icon: <MouseIcon sx={{ fontSize: 38 }} />,
       description: "User clicks",
+    },
+    { 
+      title: "Filters", 
+      value: data.filter, 
+      icon: <FilterAltIcon sx={{ fontSize:38 }} />, 
+      description: "Category filters applied" 
     },
   ];
 
@@ -195,7 +253,129 @@ const AnalyticsDashboard = () => {
             </Grid>
           ))}
         </Grid>
+<Grid container spacing={4} sx={{ mt: 6 }}>
 
+  {/* Top Searched Keywords */}
+  <Grid size={{ xs: 12, md: 6 }}>
+    <Typography variant="h5" sx={{ fontWeight: 700, color: "#071A33", mb: 3 }}>
+      Top Searched Keywords
+    </Typography>
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{ border: "1px solid #E4E7EC", borderRadius: 3, maxWidth: 500 }}
+    >
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 700, color: "#12233F" }}>
+              Keyword
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, color: "#12233F" }} align="right">
+              Searches
+            </TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {topQueries.map((item) => (
+            <TableRow key={item.keyword}>
+              <TableCell sx={{ color: "#12233F" }}>
+                {item.keyword}
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: 600, color: "#2F75FF" }}>
+                {item.count}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Grid>
+
+  {/* Most Clicked Products */}
+  <Grid size={{ xs: 12, md: 6 }}>
+    <Typography variant="h5" sx={{ fontWeight: 700, color: "#071A33", mb: 3 }}>
+      Most Clicked Products
+    </Typography>
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{ border: "1px solid #E4E7EC", borderRadius: 3, maxWidth: 500 }}
+    >
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 700, color: "#12233F" }}>
+              Product
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, color: "#12233F" }} align="right">
+              Clicks
+            </TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {topProducts.map((item) => (
+            <TableRow key={item.productName}>
+              <TableCell sx={{ color: "#12233F" }}>
+                {item.productName}
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: 600, color: "#2F75FF" }}>
+                {item.count}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Grid>
+
+  <Grid size={{ xs: 12, md: 6 }}>
+  <Typography variant="h5" sx={{ fontWeight: 700, color: "#071A33", mb: 3 }}>
+    Most Filtered Categories
+  </Typography>
+
+  {topCategories.length === 0 ? (
+    <Typography sx={{ color: "#98A2B3" }}>
+      No category filters recorded yet.
+    </Typography>
+  ) : (
+    <TableContainer
+      component={Paper}
+      elevation={0}
+      sx={{ border: "1px solid #E4E7EC", borderRadius: 3, maxWidth: 500 }}
+    >
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 700, color: "#12233F" }}>
+              Category
+            </TableCell>
+            <TableCell sx={{ fontWeight: 700, color: "#12233F" }} align="right">
+              Filters
+            </TableCell>
+          </TableRow>
+        </TableHead>
+
+        <TableBody>
+          {topCategories.map((item) => (
+            <TableRow key={item.category}>
+              <TableCell sx={{ color: "#12233F" }}>{item.category}</TableCell>
+              <TableCell align="right" sx={{ fontWeight: 600, color: "#2F75FF" }}>
+                {item.count}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  )}
+</Grid>
+
+</Grid>
+
+<AskAI></AskAI>
       </Container>
     </Box>
   );

@@ -77,7 +77,7 @@ cd /d "C:\path\to\opensearch-3.0.0-windows-x64\opensearch-3.0.0"
 opensearch-windows-install.bat
 
 Initialize UBI during the first setup:
-curl.exe -k -u "admin:<password>" -X POST "https://localhost:9200/_plugins/ubi/initialize"
+curl.exe -k -u "admin: <password> " -X POST "https://localhost:9200/_plugins/ubi/initialize"
 
 ### 2. Start MongoDB
 Make sure MongoDB is running locally on:
